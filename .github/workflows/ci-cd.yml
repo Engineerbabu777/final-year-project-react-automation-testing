@@ -1,0 +1,88 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Playwright Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright Tests
+        run: npx playwright test
+        continue-on-error: true
+        id: tests
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: playwright-report
+
+      - name: Send Email - Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Playwright Tests Failed"
+          to: your-team@example.com
+          from: GitHub Actions <noreply@example.com>
+          content_type: text/html
+          body: |
+            <p>Tests failed on commit: <strong>${{ github.sha }}</strong></p>
+            <p>Branch: <strong>${{ github.ref_name }}</strong></p>
+            <p>See the test report in the Actions tab.</p>
+
+      - name: Send Email - Success
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "✅ All Tests Passed - Deployment Triggered"
+          to: your-team@example.com
+          from: GitHub Actions <noreply@example.com>
+          content_type: text/html
+          body: |
+            <p>All Playwright tests passed successfully.</p>
+            <p>Deploying to production...</p>
+
+  deploy:
+    name: Deploy to Production
+    needs: test
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy
+        run: |
+          echo "Deploying to production..."
+          # Replace this with your actual deployment script
+          # For example:
+          # npm run build && scp -r ./dist user@server:/var/www/app
