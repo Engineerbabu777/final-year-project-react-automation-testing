@@ -92,7 +92,10 @@ jobs:
           script: |
             cd ~/app/backend
             npm install
-            pm2 restart backend || pm2 start src/index.js --name backend
+            npm run build
+            pm2 describe backend > /dev/null \
+              && pm2 restart backend \
+              || pm2 start npm --name backend -- start
 
       - name: Build & Deploy Frontend on EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -105,5 +108,3 @@ jobs:
             npm install
             npm run build
             sudo cp -r dist/* /usr/share/nginx/html
-
-            
