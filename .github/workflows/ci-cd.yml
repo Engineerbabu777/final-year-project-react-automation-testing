@@ -108,3 +108,32 @@ jobs:
             npm install
             npm run build
             sudo cp -r dist/* /usr/share/nginx/html
+
+  notify-on-failure:
+    name: Send Failure Email
+    needs: test
+    if: ${{ needs.test.result == 'failure' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send failure email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "🚨 Playwright Tests Failed in CI/CD Pipeline"
+          to: ${{ secrets.MAIL_TO }}
+          from: ${{ secrets.MAIL_USERNAME }}
+          content_type: text/plain
+          body: |
+            Hello,
+
+            The Playwright tests in the GitHub Actions CI/CD pipeline have failed.
+            Please check the GitHub Actions run below for details:
+
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Regards,
+            CI/CD Bot
