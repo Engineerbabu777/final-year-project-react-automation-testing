@@ -128,7 +128,7 @@ jobs:
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASS }}
           from: ${{ secrets.EMAIL_USER }}
-          to: ${{ secrets.EMAIL_TO }}
+          to: ${{ secrets.EMAIL_TO_LIST }}  # Comma-separated list in secret
           subject: "${{ env.STATUS }} - GitHub CI/CD Notification"
           body: |
             Hello,
