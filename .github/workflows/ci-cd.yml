@@ -109,31 +109,36 @@ jobs:
             npm run build
             sudo cp -r dist/* /usr/share/nginx/html
 
-  notify-on-failure:
-    name: Send Failure Email
+  notify-test-result:
+    name: Send Test Result Email
     needs: test
-    if: ${{ needs.test.result == 'failure' }}
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
-      - name: Send failure email
+      - name: Set TEST_STATUS variable
+        run: echo "TEST_STATUS=${{ needs.test.result == 'success' && 'PASSED' || 'FAILED' }}" >> $GITHUB_ENV
+
+      - name: Send email notification
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          username: ${{ secrets.EMAIL_USER }}
-          password: ${{ secrets.EMAIL_PASS }}
-          subject: "🚨 Playwright Tests Failed in CI/CD Pipeline"
+          username: ${{ secrets.MAIL_USER }}
+          password: ${{ secrets.MAIL_PASS }}
+          subject: "🚨 Playwright Tests ${{ env.TEST_STATUS }} in CI/CD"
           to: ${{ secrets.MAIL_TO }}
-          from: ${{ secrets.EMAIL_USER }}
+          from: ${{ secrets.MAIL_USER }}
           content_type: text/plain
           body: |
             Hello,
 
-            The Playwright tests in the GitHub Actions CI/CD pipeline have failed.
-            Please check the GitHub Actions run below for details:
+            The Playwright tests have **${{ env.TEST_STATUS }}** in the GitHub Actions CI/CD pipeline.
 
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            ➤ Repository: ${{ github.repository }}
+            ➤ Commit: ${{ github.sha }}
+            ➤ Branch: ${{ github.ref }}
+            ➤ Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             Regards,
             CI/CD Bot
