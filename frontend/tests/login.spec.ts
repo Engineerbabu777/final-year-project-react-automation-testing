@@ -6,7 +6,7 @@ test("should allow the user to sign in", async ({ page }) => {
   await page.goto(UI_URL);
 
   // get the sign in button
-  await page.getByRole("link", { name: "Sign In" }).click();
+  await page.getByRole("link", { name: "Siggggg " }).click();
 
   await expect(page.getByRole("heading", { name: "Sign In" })).toBeVisible();
 
