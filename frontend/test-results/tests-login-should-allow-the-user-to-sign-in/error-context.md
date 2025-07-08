@@ -19,6 +19,14 @@
 - button "Clear"
 - heading "Latest Destinations" [level=2]
 - paragraph: Most recent desinations added by our hosts
+- link "Dublin Getaways 1750754664706":
+  - /url: /detail/685a6569df46cb10c8ef7b86
+  - img
+  - text: Dublin Getaways 1750754664706
+- link "Dublin Getaways 1750753981228":
+  - /url: /detail/685a62c1a00c1e62c183e2e7
+  - img
+  - text: Dublin Getaways 1750753981228
 - link "Dublin Getaways 1750753940908":
   - /url: /detail/685a6298a00c1e62c183e2db
   - img
